@@ -1,0 +1,1 @@
+These are the original publicly distributed dedicated server files and patches, copyright belongs to the original rightsholder
