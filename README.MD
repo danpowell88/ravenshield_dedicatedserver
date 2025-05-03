@@ -116,3 +116,7 @@ Run an adversarial server
 ```sh
 docker run -e GAME_PRESET=ADVERSARIAL -p:7777:7777/udp -p:8777:8777/udp -p:9777:9777/udp ghcr.io/danpowell88/ravenshield_dedicatedserver
 ```
+
+# Future Enhancements
+Create a debug build of OpenRVS so its easier to tell what is going on when the server isnt being registered
+Download the game files from internet archive at runtime
