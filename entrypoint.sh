@@ -385,6 +385,7 @@ register_with_openrvs() {
     if [ "$ip" != "$LAST_OPENRVS_IP" ]; then
         echo "Registering server with OpenRVS: $address"
         curl -s -o - -X POST https://openrvs.org/servers/add -d "$address"
+        echo "Server registered with OpenRVS: $address"
         export LAST_OPENRVS_IP="$ip"
     else
         echo "OpenRVS registration skipped (IP unchanged: $ip)"
