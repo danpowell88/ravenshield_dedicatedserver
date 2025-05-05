@@ -174,16 +174,6 @@ if [ -z "$INTERNET_SERVER" ]; then
     INTERNET_SERVER=$(crudini --get "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "InternetServer" 2>/dev/null || echo "")
 fi
 
-# Auto determine public IP if not provided
-if [ -z "$PUBLIC_IP" ] && [[ "${INTERNET_SERVER,,}" == "true" ]]; then
-    PUBLIC_IP=$(curl -s https://api.ipify.org || true)
-    if [ -z "$PUBLIC_IP" ]; then
-        echo "Warning: Could not determine public IP address. Continuing without PUBLIC_IP."
-    else
-        echo "Public IP detected: $PUBLIC_IP"
-    fi
-fi
-
 # Set base ports, these are calculated due to OpenRVS requirements
 if [ -z "$PORT" ]; then
     # Read port from INI file if not set in environment
@@ -366,16 +356,63 @@ OPENRVS_UPTODATE_PATTERN="${OPENRVS_UPTODATE_PATTERN:-*OpenRVS is up to date*}"
 # Convert shell wildcards to regex
 OPENRVS_UPTODATE_REGEX="^${OPENRVS_UPTODATE_PATTERN//\*/.*}$"
 
+# Registration interval in seconds (default 3600 = 60 minutes)
+OPENRVS_REGISTRATION_INTERVAL="${OPENRVS_REGISTRATION_INTERVAL:-3600}"
+
+register_with_openrvs() {
+    # Use PUBLIC_IP if provided, otherwise determine current public IP
+    local ip port
+    if [ -n "$PUBLIC_IP" ]; then
+        ip="$PUBLIC_IP"
+    else
+        ip=$(curl -s https://api.ipify.org || true)
+    fi
+    if [ -z "$ip" ]; then
+        echo "Warning: Could not determine public IP address for OpenRVS registration."
+        return 1
+    fi
+    port="$PORT"
+    if [ -z "$port" ]; then
+        port=$(crudini --get "$GAMEFILES_DIR/system/$INI_CFG" "URL" "Port")
+    fi
+    if [ -z "$port" ]; then
+        echo "Warning: Could not determine server port for OpenRVS registration."
+        return 1
+    fi
+    local address="${ip}:${port}"
+
+    # Only register if IP has changed
+    if [ "$ip" != "$LAST_OPENRVS_IP" ]; then
+        echo "Registering server with OpenRVS: $address"
+        curl -s -o - -X POST https://openrvs.org/servers/add -d "$address"
+        export LAST_OPENRVS_IP="$ip"
+    else
+        echo "OpenRVS registration skipped (IP unchanged: $ip)"
+    fi
+}
+
 # Start the RavenShield server and optionally register with OpenRVS once it's up
 cd $GAMEFILES_DIR/system
+OPENRVS_REGISTERED=0
 wine UCC.exe server -ini="$INI_CFG" -serverini="$SERVER_CFG" -log 2>&1 | while read -r line; do
     echo "$line"
 
-    if [[ "${OPENRVS_MANUAL_REGISTRATION,,}" == "true" ]] && [[ "${INTERNET_SERVER,,}" == "true" ]] && [ ! -z "$PUBLIC_IP" ] && [ ! -z "$PORT" ]; then
-        if [[ "$line" =~ $OPENRVS_UPTODATE_REGEX ]]; then
-            SERVER_ADDRESS="${PUBLIC_IP}:${PORT}"
-            echo "Registering server with OpenRVS: $SERVER_ADDRESS"
-            curl -s -o - -X POST https://openrvs.org/servers/add -d "$SERVER_ADDRESS"
+    if [[ "${OPENRVS_MANUAL_REGISTRATION,,}" == "true" ]] && [[ "${INTERNET_SERVER,,}" == "true" ]]; then
+        if [[ "$line" =~ $OPENRVS_UPTODATE_REGEX ]] && [[ "$OPENRVS_REGISTERED" -eq 0 ]]; then
+            # Register immediately
+            register_with_openrvs
+
+            # Start background registration loop if not already running
+            if [ -z "$OPENRVS_REGISTRATION_LOOP_STARTED" ]; then
+                export OPENRVS_REGISTRATION_LOOP_STARTED=1
+                (
+                    while true; do
+                        sleep "$OPENRVS_REGISTRATION_INTERVAL"
+                        register_with_openrvs
+                    done
+                ) &
+            fi
+            OPENRVS_REGISTERED=1
         fi
     fi
 done
