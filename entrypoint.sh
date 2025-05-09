@@ -280,8 +280,74 @@ if [ ! -z "$GAME_PRESET" ]; then
                 fi                               
             done
             ;;
+        "DEATHMATCH")
+            echo "Setting up server for deathmatch mode"
+            # Set deathmatch preset values
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "MaxPlayers" "16"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "NbTerro" "0"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundTime" "240"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BetweenRoundTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BombTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFirstPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamThirdPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFreeThirdP" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamGhost" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFadeToBlack" "False"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamTeamOnly" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "FriendlyFire" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "Autobalance" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "TeamKillerPenalty" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "AllowRadar" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundsPerMatch" "10"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ForceFPersonWeapon" "True"
+
+            declare -A maps=([0]="Airport" [1]="Alpines" [2]="Bank" [3]="Garage" [4]="Import_Export" 
+                           [5]="Island_Dawn" [6]="MeatPacking" [7]="Mountain_High" [8]="Oil_Refinery"
+                           [9]="Parade" [10]="Peaks" [11]="Penthouse" [12]="Presidio" [13]="Prison"
+                           [14]="Shipyard" [15]="Streets" [16]="Training" [17]="Warehouse")
+
+            for i in {0..31}; do
+                if [ ! -z "${maps[$i]}" ]; then
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "Maps[$i]" "${maps[$i]}"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "GameType[$i]" "R6Game.R6DeathMatch"
+                fi
+            done
+            ;;
+        "TEAMDEATHMATCH")
+            echo "Setting up server for team deathmatch mode"
+            # Set team deathmatch preset values
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "MaxPlayers" "16"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "NbTerro" "0"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundTime" "240"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BetweenRoundTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BombTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFirstPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamThirdPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFreeThirdP" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamGhost" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFadeToBlack" "False"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamTeamOnly" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "FriendlyFire" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "Autobalance" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "TeamKillerPenalty" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "AllowRadar" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundsPerMatch" "10"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ForceFPersonWeapon" "True"
+
+            declare -A maps=([0]="Airport" [1]="Alpines" [2]="Bank" [3]="Garage" [4]="Import_Export" 
+                           [5]="Island_Dawn" [6]="MeatPacking" [7]="Mountain_High" [8]="Oil_Refinery"
+                           [9]="Parade" [10]="Peaks" [11]="Penthouse" [12]="Presidio" [13]="Prison"
+                           [14]="Shipyard" [15]="Streets" [16]="Training" [17]="Warehouse")
+
+            for i in {0..31}; do
+                if [ ! -z "${maps[$i]}" ]; then
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "Maps[$i]" "${maps[$i]}"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "GameType[$i]" "R6Game.R6TeamDeathMatchGame"
+                fi
+            done
+            ;;
         *)
-            echo "ERROR: Invalid game preset '$GAME_PRESET'. Valid options are 'ADVERSARIAL' or 'COOP'."
+            echo "ERROR: Invalid game preset '$GAME_PRESET'. Valid options are 'ADVERSARIAL', 'COOP', 'DEATHMATCH', or 'TEAMDEATHMATCH'."
             exit 1
             ;;
     esac
