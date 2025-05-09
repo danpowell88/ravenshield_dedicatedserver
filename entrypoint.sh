@@ -212,6 +212,7 @@ if [ ! -z "$GAME_PRESET" ]; then
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "AllowRadar" "True"
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundsPerMatch" "10"
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ForceFPersonWeapon" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield ADVER"
 
             declare -A maps=([0]="Airport" [1]="Alpines" [2]="Bank" [3]="Garage" [4]="Import_Export" 
                            [5]="Island_Dawn" [6]="MeatPacking" [7]="Mountain_High" [8]="Oil_Refinery"
@@ -257,6 +258,7 @@ if [ ! -z "$GAME_PRESET" ]; then
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ForceFPersonWeapon" "False"
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "AIBkp" "True"
             crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "DiffLevel" "2"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield COOP"
 
             declare -A maps=([0]="Airport" [1]="Alpines" [2]="Bank" [3]="Garage" [4]="Import_Export" 
                            [5]="Island_Dawn" [6]="MeatPacking" [7]="Mountain_High" [8]="Oil_Refinery"
@@ -280,8 +282,70 @@ if [ ! -z "$GAME_PRESET" ]; then
                 fi                               
             done
             ;;
+        "DEATHMATCH"|"TEAMDEATHMATCH"|"BOMB"|"HOSTAGERESCUE"|"ESCORTPILOT")
+            # Use adversarial settings for all these presets, just change gametype and server name
+            case "$GAME_PRESET" in
+                "DEATHMATCH")
+                    echo "Setting up server for deathmatch mode"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield DM"
+                    gametype="R6Game.R6DeathMatch"
+                    ;;
+                "TEAMDEATHMATCH")
+                    echo "Setting up server for team deathmatch mode"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield TDM"
+                    gametype="R6Game.R6TeamDeathMatchGame"
+                    ;;
+                "BOMB")
+                    echo "Setting up server for bomb mode"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield BOMB"
+                    gametype="R6Game.R6TeamBomb"
+                    ;;
+                "HOSTAGERESCUE")
+                    echo "Setting up server for hostage rescue mode"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield HR"
+                    gametype="R6Game.R6HostageRescueAdvGame"
+                    ;;
+                "ESCORTPILOT")
+                    echo "Setting up server for escort pilot mode"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ServerName" "Raven Shield ESCORT"
+                    gametype="R6Game.R6EscortPilotGame"
+                    ;;
+            esac
+
+            # Use the same settings as adversarial
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "MaxPlayers" "16"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "NbTerro" "0"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundTime" "240"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BetweenRoundTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "BombTime" "45"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFirstPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamThirdPerson" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFreeThirdP" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamGhost" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamFadeToBlack" "False"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "CamTeamOnly" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "FriendlyFire" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "Autobalance" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "TeamKillerPenalty" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "AllowRadar" "True"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "RoundsPerMatch" "10"
+            crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6ServerInfo" "ForceFPersonWeapon" "True"
+
+            declare -A maps=([0]="Airport" [1]="Alpines" [2]="Bank" [3]="Garage" [4]="Import_Export" 
+                           [5]="Island_Dawn" [6]="MeatPacking" [7]="Mountain_High" [8]="Oil_Refinery"
+                           [9]="Parade" [10]="Peaks" [11]="Penthouse" [12]="Presidio" [13]="Prison"
+                           [14]="Shipyard" [15]="Streets" [16]="Training" [17]="Warehouse")
+
+            for i in {0..31}; do
+                if [ ! -z "${maps[$i]}" ]; then
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "Maps[$i]" "${maps[$i]}"
+                    crudini --set "$GAMEFILES_DIR/system/$SERVER_CFG" "Engine.R6MapList" "GameType[$i]" "$gametype"
+                fi
+            done
+            ;;
         *)
-            echo "ERROR: Invalid game preset '$GAME_PRESET'. Valid options are 'ADVERSARIAL' or 'COOP'."
+            echo "ERROR: Invalid game preset '$GAME_PRESET'."
+            echo "Valid options are: ADVERSARIAL, COOP, DEATHMATCH, TEAMDEATHMATCH, BOMB, HOSTAGERESCUE, ESCORTPILOT."
             exit 1
             ;;
     esac
