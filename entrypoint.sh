@@ -130,6 +130,8 @@ if [[ "${BYO_GAMEFILES,,}" != "true" || "${INSTALL_OPENRVS,,}" == "true" ]]; the
     mkdir -p $SETUP_DIR/extracted_files/openrvs
     unzip $SETUP_DIR/openrvs/openrvs.zip -d "$SETUP_DIR/extracted_files/openrvs"
 
+    echo "OPENRVSDEBUG: ${OPENRVS_DEBUG,,}"
+
     # If OPENRVS_DEBUG is true, use debug files and rename them
     if [[ "${OPENRVS_DEBUG,,}" == "true" ]]; then
         echo "Using OpenRVS debug binaries"
@@ -421,9 +423,9 @@ for i in {0..31}; do
 done
 
 # Update INI files using the dedicated script
-/update_ini.sh "SERVER_" "$GAMEFILES_DIR/system/$SERVER_CFG"
-/update_ini.sh "RAVENSHIELD_" "$GAMEFILES_DIR/system/$INI_CFG"
-/update_ini.sh "OPENRVS_" "$GAMEFILES_DIR/system/openrvs.ini"
+/update_ini.sh "SERVER_SETTING_" "$GAMEFILES_DIR/system/$SERVER_CFG"
+/update_ini.sh "RAVENSHIELD_SETTING_" "$GAMEFILES_DIR/system/$INI_CFG"
+/update_ini.sh "OPENRVS_SETTING_" "$GAMEFILES_DIR/system/openrvs.ini"
 
 # Define the pattern with wildcards (e.g. "*OpenRVS is up to date*")
 OPENRVS_UPTODATE_PATTERN="${OPENRVS_UPTODATE_PATTERN:-*OpenRVS is up to date*}"
