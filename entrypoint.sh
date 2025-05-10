@@ -42,7 +42,7 @@ else
     elif [[ "${INSTALL_OPENRVS,,}" == "true" ]]; then        
         echo "Downloading OpenRVS..."
         mkdir -p $SETUP_DIR/openrvs 
-        curl -L -o $SETUP_DIR/openrvs/openrvs.zip "https://github.com/OpenRVS-devs/OpenRVS/releases/download/v1.6/OpenRVS-v1.6.zip" 
+        curl -L -o $SETUP_DIR/openrvs/openrvs.zip "https://github.com/danpowell88/OpenRVS/releases/download/v1.6/OpenRVS-v1.6.zip" 
     else
         echo "Skipping OpenRVS download as INSTALL_OPENRVS is not set to true."
     fi
@@ -129,6 +129,19 @@ if [[ "${BYO_GAMEFILES,,}" != "true" || "${INSTALL_OPENRVS,,}" == "true" ]]; the
     echo "Patching OpenRVS"
     mkdir -p $SETUP_DIR/extracted_files/openrvs
     unzip $SETUP_DIR/openrvs/openrvs.zip -d "$SETUP_DIR/extracted_files/openrvs"
+
+    echo "OPENRVSDEBUG: ${OPENRVS_DEBUG,,}"
+
+    # If OPENRVS_DEBUG is true, use debug files and rename them
+    if [[ "${OPENRVS_DEBUG,,}" == "true" ]]; then
+        echo "Using OpenRVS debug binaries"
+        if [ -f "$SETUP_DIR/extracted_files/openrvs/OpenRVS-Debug.u" ]; then
+            mv -f "$SETUP_DIR/extracted_files/openrvs/OpenRVS-Debug.u" "$SETUP_DIR/extracted_files/openrvs/OpenRVS.u"
+        fi
+        if [ -f "$SETUP_DIR/extracted_files/openrvs/OpenRenderFix-Debug.utx" ]; then
+            mv -f "$SETUP_DIR/extracted_files/openrvs/OpenRenderFix-Debug.utx" "$SETUP_DIR/extracted_files/openrvs/OpenRenderFix.utx"
+        fi
+    fi    
     
     cp -f $SETUP_DIR/extracted_files/openrvs/openrvs.ini $SETUP_DIR/extracted_files/openrvs/OpenRVS.u $SETUP_DIR/extracted_files/openrvs/R6ClassDefines.ini $SETUP_DIR/extracted_files/openrvs/Servers.list $GAMEFILES_DIR/system/ 
     cp -f $SETUP_DIR/extracted_files/openrvs/OpenRenderFix.utx $GAMEFILES_DIR/textures/OpenRenderFix.utx    
@@ -410,9 +423,9 @@ for i in {0..31}; do
 done
 
 # Update INI files using the dedicated script
-/update_ini.sh "SERVER_" "$GAMEFILES_DIR/system/$SERVER_CFG"
-/update_ini.sh "RAVENSHIELD_" "$GAMEFILES_DIR/system/$INI_CFG"
-/update_ini.sh "OPENRVS_" "$GAMEFILES_DIR/system/openrvs.ini"
+/update_ini.sh "SERVER_SETTING_" "$GAMEFILES_DIR/system/$SERVER_CFG"
+/update_ini.sh "RAVENSHIELD_SETTING_" "$GAMEFILES_DIR/system/$INI_CFG"
+/update_ini.sh "OPENRVS_SETTING_" "$GAMEFILES_DIR/system/openrvs.ini"
 
 # Define the pattern with wildcards (e.g. "*OpenRVS is up to date*")
 OPENRVS_UPTODATE_PATTERN="${OPENRVS_UPTODATE_PATTERN:-*OpenRVS is up to date*}"
