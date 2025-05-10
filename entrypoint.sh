@@ -483,9 +483,7 @@ wine UCC.exe server -ini="$INI_CFG" -serverini="$SERVER_CFG" -log 2>&1 | while r
         OPENRVS_SERVER_INFO_STARTED=1
         (
             while true; do
-                if [ ! -z "$SERVER_LOCAL_IP" ]; then
-                    go run -C /beaconclient/ /beaconclient/beacon.go -port $SERVER_BEACON_PORT
-                fi
+                go run -C /beaconclient/ /beaconclient/beacon.go -port $SERVER_BEACON_PORT
                 sleep "$OPENRVS_SERVER_INFO_INTERVAL"
             done
         ) &
