@@ -8,12 +8,18 @@ VOLUME /rvs
 # Install only required runtime packages
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
-    apt-get install -y wine32:i386 xvfb python3 crudini curl unzip xxd && \
+    apt-get install -y wine32:i386 xvfb python3 crudini curl unzip xxd golang-go jq && \
     apt-get clean
 
 # Copy scripts and make them executable
 COPY entrypoint.sh update_ini.sh /
 RUN chmod +x /entrypoint.sh /update_ini.sh
+
+COPY beacon.go /beaconclient/
+
+RUN cd /beaconclient && \
+    go mod init beaconclient && \
+    go mod tidy     
 
 # Set environment variables
 ENV DISPLAY=:0.0
@@ -21,5 +27,6 @@ ENV INI_CFG=RavenShield.ini
 ENV SERVER_CFG=Server.ini
 ENV INSTALL_OPENRVS=true
 ENV PATCH_R6GAMESERVICE=true
+ENV OPENRVS_SERVER_INFO_INTERVAL=300
 
 ENTRYPOINT ["/entrypoint.sh"]

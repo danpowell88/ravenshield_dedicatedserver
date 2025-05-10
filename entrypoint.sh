@@ -472,8 +472,22 @@ register_with_openrvs() {
 # Start the RavenShield server and optionally register with OpenRVS once it's up
 cd $GAMEFILES_DIR/system
 OPENRVS_REGISTERED=0
+OPENRVS_SERVER_INFO_STARTED=0
+
 wine UCC.exe server -ini="$INI_CFG" -serverini="$SERVER_CFG" -log 2>&1 | while read -r line; do
     echo "$line"
+
+
+    # Wait for up-to-date regex before starting go server info sender
+    if [[ "$line" =~ $OPENRVS_UPTODATE_REGEX ]] && [[ "$OPENRVS_SERVER_INFO_STARTED" -eq 0 ]]; then
+        OPENRVS_SERVER_INFO_STARTED=1
+        (
+            while true; do
+                go run -C /beaconclient/ /beaconclient/beacon.go -port $SERVER_BEACON_PORT
+                sleep "$OPENRVS_SERVER_INFO_INTERVAL"
+            done
+        ) &
+    fi
 
     if [[ "${OPENRVS_MANUAL_REGISTRATION,,}" == "true" ]] && [[ "${INTERNET_SERVER,,}" == "true" ]]; then
         if [[ "$line" =~ $OPENRVS_UPTODATE_REGEX ]] && [[ "$OPENRVS_REGISTERED" -eq 0 ]]; then
