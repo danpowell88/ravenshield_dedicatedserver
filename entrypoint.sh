@@ -130,8 +130,6 @@ if [[ "${BYO_GAMEFILES,,}" != "true" || "${INSTALL_OPENRVS,,}" == "true" ]]; the
     mkdir -p $SETUP_DIR/extracted_files/openrvs
     unzip $SETUP_DIR/openrvs/openrvs.zip -d "$SETUP_DIR/extracted_files/openrvs"
 
-    echo "OPENRVSDEBUG: ${OPENRVS_DEBUG,,}"
-
     # If OPENRVS_DEBUG is true, use debug files and rename them
     if [[ "${OPENRVS_DEBUG,,}" == "true" ]]; then
         echo "Using OpenRVS debug binaries"
