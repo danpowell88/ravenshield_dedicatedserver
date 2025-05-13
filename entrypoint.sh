@@ -147,7 +147,7 @@ if [[ "${BYO_GAMEFILES,,}" != "true" || "${INSTALL_OPENRVS,,}" == "true" ]]; the
     echo "Patching OpenRVS configuration"
     # Add OpenRVS configuration to Ravenshield.mod
     MOD_FILE="$GAMEFILES_DIR/mods/RavenShield.mod"
-    sed -i '/ServerActions=IpDrv.UdpBeacon/d' "$MOD_FILE"
+    sed -i '/ServerActors=IpDrv.UdpBeacon/d' "$MOD_FILE"
     grep -q "ServerActors=OpenRVS.OpenServer" "$MOD_FILE" || echo "ServerActors=OpenRVS.OpenServer" >> "$MOD_FILE"
     grep -q "ServerActors=OpenRVS.OpenBeacon" "$MOD_FILE" || echo "ServerActors=OpenRVS.OpenBeacon" >> "$MOD_FILE"
     grep -q "ServerActors=OpenRenderFix.OpenFix" "$MOD_FILE" || echo "ServerActors=OpenRenderFix.OpenFix" >> "$MOD_FILE"
