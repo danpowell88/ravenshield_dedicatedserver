@@ -66,7 +66,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}                         
           flavor: |                        
-            suffix=alpine
+            prefix=alpine-
       - name: Build and push Docker image (alpine)
         id: push-alpine
         uses: docker/build-push-action@v6
@@ -74,7 +74,7 @@ jobs:
           context: .
           file: Dockerfile.alpine
           push: true
-          tags: ${{ steps.meta-alpine.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest-alpine', env.REGISTRY, env.IMAGE_NAME) || '' }} 
+          tags: ${{ steps.meta-alpine.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:alpine-latest', env.REGISTRY, env.IMAGE_NAME) || '' }} 
           labels: ${{ steps.meta-alpine.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
