@@ -61,7 +61,7 @@ jobs:
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true      
       - name: Extract metadata (tags, labels) for Docker
-        id: meta
+        id: meta-alpine
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}                         
@@ -73,8 +73,8 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest-alpine', env.REGISTRY, env.IMAGE_NAME) || '' }} 
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-alpine.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest-alpine', env.REGISTRY, env.IMAGE_NAME) || '' }} 
+          labels: ${{ steps.meta-alpine.outputs.labels }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       - name: Generate artifact attestation
