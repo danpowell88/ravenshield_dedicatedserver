@@ -1,0 +1,32 @@
+FROM i386/alpine:latest
+
+LABEL org.opencontainers.image.title="RavenShield Dedicated Server (Alpine)"
+LABEL org.opencontainers.image.description="A dedicated server for RavenShield using Wine on Alpine."
+
+VOLUME /rvs
+
+# Install required runtime packages
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories && \
+    apk update && \
+    apk add --no-cache wine xvfb python3 py3-pip curl unzip xxd go jq bash && \
+    pip3 install --break-system-packages crudini
+ 
+# Copy scripts and make them executable
+COPY entrypoint.sh update_ini.sh /
+RUN chmod +x /entrypoint.sh /update_ini.sh
+
+COPY beacon.go /beaconclient/
+
+RUN cd /beaconclient && \
+    go mod init beaconclient && \
+    go mod tidy
+
+# Set environment variables
+ENV DISPLAY=:0.0
+ENV INI_CFG=RavenShield.ini
+ENV SERVER_CFG=Server.ini
+ENV INSTALL_OPENRVS=true
+ENV PATCH_R6GAMESERVICE=true
+ENV OPENRVS_SERVER_INFO_INTERVAL=300
+
+ENTRYPOINT ["/entrypoint.sh"]
