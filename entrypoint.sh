@@ -27,7 +27,8 @@ fi
 if [[ "${BYO_GAMEFILES,,}" == "true" ]]; then
     echo "BYO_GAMEFILES is true, skipping download and extraction of server files."
 else
-    # Skip download_server_files if $GAMEFILES_DIR is not empty, allows providing own source for game files
+    # Skip download_server_files if $SETUP_DIR is not empty, allows providing own source for game files
+    # and redownloading server files if they already exist
     if [ "$(ls -A "$SETUP_DIR/game" 2>/dev/null)" ]; then
         echo "Setup games files directory is not empty, skipping downloading server files."    
     else
@@ -38,7 +39,7 @@ else
     fi
 
     if [ "$(ls -A "$SETUP_DIR/openrvs" 2>/dev/null)" ]; then
-        echo "Setup openrvs files directory is not empty, skipping downloading server files."    
+        echo "Setup openrvs files directory is not empty, skipping downloading openrvs files."    
     elif [[ "${INSTALL_OPENRVS,,}" == "true" ]]; then        
         echo "Downloading OpenRVS..."
         mkdir -p $SETUP_DIR/openrvs 
@@ -175,10 +176,6 @@ validate_gametype() {
             ;;
     esac
 }
-
-# Start Xvfb
-Xvfb :0 -screen 0 1024x768x16 &
-sleep 1
 
 # If INTERNET_SERVER is not set, read it from the server config INI
 if [ -z "$INTERNET_SERVER" ]; then
@@ -471,6 +468,12 @@ register_with_openrvs() {
 cd $GAMEFILES_DIR/system
 OPENRVS_REGISTERED=0
 OPENRVS_SERVER_INFO_STARTED=0
+
+wineboot --init
+
+# Start Xvfb
+Xvfb :0 -screen 0 1024x768x16 &
+sleep 10
 
 wine UCC.exe server -ini="$INI_CFG" -serverini="$SERVER_CFG" -log 2>&1 | while read -r line; do
     echo "$line"
