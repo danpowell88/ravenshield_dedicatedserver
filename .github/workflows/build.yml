@@ -72,6 +72,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: Dockerfile.alpine
           push: true
           tags: ${{ steps.meta-alpine.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest-alpine', env.REGISTRY, env.IMAGE_NAME) || '' }} 
           labels: ${{ steps.meta-alpine.outputs.labels }}
