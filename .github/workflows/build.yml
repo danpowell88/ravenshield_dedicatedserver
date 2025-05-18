@@ -39,19 +39,21 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Set image tag for main image
+        id: set_tag
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:latest', env.REGISTRY, env.IMAGE_NAME) || '' }} 
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ghcr.io/danpowell88/ravenshield_dedicatedserver:${{ steps.set_tag.outputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       - name: Generate artifact attestation
@@ -59,14 +61,15 @@ jobs:
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
           subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true      
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta-alpine
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}                         
-          flavor: |                     
-            prefix="alpine-"
+          push-to-registry: true
+      - name: Set image tag for main image
+        id: set_tag_alpine
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi               
       - name: Build and push Docker image (alpine)
         id: push-alpine
         uses: docker/build-push-action@v6
@@ -74,8 +77,7 @@ jobs:
           context: .
           file: Dockerfile.alpine
           push: true
-          tags: ${{ steps.meta-alpine.outputs.tags }},${{ github.ref == 'refs/heads/main' && format('{0}/{1}:alpine-latest', env.REGISTRY, env.IMAGE_NAME) || '' }} 
-          labels: ${{ steps.meta-alpine.outputs.labels }}
+          tags: ghcr.io/danpowell88/ravenshield_dedicatedserver:${{ steps.set_tag_alpine.outputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       - name: Generate artifact attestation
