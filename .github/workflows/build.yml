@@ -66,9 +66,9 @@ jobs:
         id: set_tag_alpine
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "tag=pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "tag=pr-${{ github.event.pull_request.number }}-alpine" >> $GITHUB_OUTPUT
           else
-            echo "tag=latest" >> $GITHUB_OUTPUT
+            echo "tag=latest-alpine" >> $GITHUB_OUTPUT
           fi               
       - name: Build and push Docker image (alpine)
         id: push-alpine

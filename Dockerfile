@@ -30,3 +30,5 @@ ENV PATCH_R6GAMESERVICE=true
 ENV OPENRVS_SERVER_INFO_INTERVAL=300
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+# TODO add a openrvs health check
