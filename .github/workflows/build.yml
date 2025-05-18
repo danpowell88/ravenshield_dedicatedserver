@@ -65,8 +65,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}                         
-          flavor: |                        
-            prefix=alpine-
+          flavor: |                     
+            prefix="alpine-"
       - name: Build and push Docker image (alpine)
         id: push-alpine
         uses: docker/build-push-action@v6
