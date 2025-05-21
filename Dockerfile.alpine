@@ -30,3 +30,6 @@ ENV PATCH_R6GAMESERVICE=true
 ENV OPENRVS_SERVER_INFO_INTERVAL=300
 
 ENTRYPOINT ["/entrypoint.sh"]
+
+HEALTHCHECK --interval=1m --timeout=10s --start-period=60s --retries=3 \
+  CMD sh -c 'go run /beaconclient/beacon.go -port $((PORT + 1000)) || exit 1'

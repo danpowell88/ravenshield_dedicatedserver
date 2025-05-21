@@ -28,7 +28,10 @@ ENV SERVER_CFG=Server.ini
 ENV INSTALL_OPENRVS=true
 ENV PATCH_R6GAMESERVICE=true
 ENV OPENRVS_SERVER_INFO_INTERVAL=300
+ENV PORT=7777
 
 ENTRYPOINT ["/entrypoint.sh"]
 
-# TODO add a openrvs health check
+
+HEALTHCHECK --interval=1m --timeout=10s --start-period=60s --retries=3 \
+  CMD bash -c 'go run /beaconclient/beacon.go -port $((PORT + 1000)) || exit 1'
